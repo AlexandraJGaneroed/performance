@@ -36,8 +36,8 @@ class PerformanceDiagram(object):
         )
 
     def create_axis(self,
-                    xlabel: str = 'Success Ratio (1-FAR)',
-                    ylabel: str = 'Probability of Detection (POD)',
+                    xlabel: str = 'Precision (Success Ratio | 1-FAR)',
+                    ylabel: str = 'Reccall (Probability of Detection POD)',
                     title: str = 'Performance Diagram',
                     ticks: Optional[List[float]] = None,
                     ticklabels: Optional[List[str]] = None,
@@ -162,6 +162,7 @@ class PerformanceDiagram(object):
 
     def plot_data(self, far=None, pod=None, csi=None, sr=None,
                   legend_elements: Optional[Union[List[dict],dict]] = None,
+                  draw_legend: bool = True,
                   **legend_kw
                   ):
         """
@@ -220,6 +221,7 @@ class PerformanceDiagram(object):
                 handles.append(handle[0])
 
         # add legend elements
+
         full_legend = []
         if self.bias_legend is not None:
             self.bias_legend.set_label('Freq. BIAS')
@@ -232,19 +234,18 @@ class PerformanceDiagram(object):
 
         full_legend += handles
 
-        if len(full_legend):
+        if draw_legend:
             self.ax.legend(handles=full_legend, loc='upper left', bbox_to_anchor=(1.0, 1.0), **legend_kw)
-
-    def far_pod_csi_sr_from_ct(self, TP, FP, FN):
+        return full_legend
+        
+    def far_pod_from_ct(self, TP, FP, FN):
         """
-        Compute FAR, POD, CSI, and SR from contingency table (TP, FP, TN, FN)
+        Compute FAR and POD from contingency table (TP, FP, TN, FN)
         """
         FAR = FP/(TP+FP)
         POD = TP/(TP+FN)
-        CSI = self.csi(FAR, POD)
-        SR = 1 - FAR
 
-        return FAR, POD, CSI, SR
+        return FAR, POD
 
     def csi(self, far, pod):
         """
@@ -259,7 +260,7 @@ class PerformanceDiagram(object):
 
     def sr(self, csi, pod):
         """
-        Compute SR from CSI and POD
+        Compute SR (aka precision) from CSI and POD
         """
         return 1/( 1/csi - 1/pod + 1 )
     
