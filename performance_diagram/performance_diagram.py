@@ -3,7 +3,6 @@ from matplotlib.axes import Axes
 from matplotlib import pyplot as plt
 from typing import Optional, List, Union
 from fractions import Fraction
-from matplotlib.lines import Line2D
 
 class PerformanceDiagram(object):
     
